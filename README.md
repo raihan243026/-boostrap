@@ -1,1 +1,1 @@
-# -boostrap
+# -boostrap .js
