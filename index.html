@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ইন্টারেক্টিভ স্টুডেন্ট গ্রেড ক্যালকুলেটর bootstrap</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Bootstrap Default Theme (Light background, primary blue/teal accent) -->
+    <!-- Application Structure Plan: A three-part SPA design. 1) Introduction. 2) An interactive demo comparing 'before' and 'after' student data side-by-side, triggered by a button, along with a chart for analysis. 3) A tabbed section to compare different JS methods (for, forEach, map). This structure is chosen to guide the user from understanding the problem to seeing the solution interactively and finally exploring alternative solutions, which is a strong pedagogical flow for a learning tool. -->
+    <!-- Visualization & Content Choices: Report Info: Student data (name, roll, marks). Goal: Inform/Compare. Viz: HTML cards for individual student data (before/after) for clarity. Interaction: A 'Calculate' button triggers the grading and result display. Report Info: Grade distribution. Goal: Compare/Analyze. Viz: Chart.js Bar Chart to show grade counts. Justification: A bar chart provides an immediate visual summary of the overall outcome. Report Info: Alternative coding methods. Goal: Organize/Inform. Viz: Tabbed interface to display code snippets. Justification: Tabs are a standard, space-efficient way to compare related blocks of content. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-content pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container my-5">
+
+        <header class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-primary mb-2">ইন্টারেক্টিভ গ্রেড ক্যালকুলেটর</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">এই অ্যাপ্লিকেশনটি জাভাস্ক্রিপ্ট ব্যবহার করে শিক্ষার্থীদের নম্বর থেকে গ্রেড নির্ধারণের প্রক্রিয়াটি প্রদর্শন করে। আপনি ইন্টারেক্টিভভাবে দেখতে পারবেন কিভাবে ডেটা প্রসেস করা হয় এবং বিভিন্ন কোডিং পদ্ধতির মধ্যে পার্থক্য কী।</p>
+        </header>
+
+        <main>
+            <section id="interactive-demo" class="mb-5">
+                <h2 class="h3 fw-bold text-center mb-4 text-primary">ইন্টারেক্টিভ ডেমো</h2>
+                
+                <div class="text-center mb-4">
+                    <button id="calculate-btn" class="btn btn-primary btn-lg shadow-sm">
+                        গ্রেড গণনা করুন
+                    </button>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h3 class="h5 fw-semibold mb-3 text-center">প্রাথমিক ডেটা (গণনার আগে)</h3>
+                        <div id="initial-data-container" class="d-flex flex-column gap-3">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="h5 fw-semibold mb-3 text-center">ফলাফল (গণনার পরে)</h3>
+                        <div id="result-data-container" class="bg-light p-4 rounded-3 d-flex flex-column gap-3" style="min-height: 200px;">
+                            <p class="text-muted text-center pt-5">গ্রেড গণনা করতে উপরের বাটনে ক্লিক করুন।</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="chart-section" class="mt-5 d-none">
+                    <h3 class="h5 fw-semibold mb-4 text-center">গ্রেড বন্টন বিশ্লেষণ</h3>
+                    <div class="chart-container bg-white p-4 rounded-3 shadow-sm">
+                        <canvas id="grade-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="my-5">
+
+            <section id="alternative-methods">
+                <h2 class="h3 fw-bold text-center mb-4 text-primary">বিকল্প কোডিং পদ্ধতি</h2>
+                <p class="text-center text-muted mx-auto mb-4" style="max-width: 600px;">একই কাজ করার জন্য জাভাস্ক্রিপ্টে একাধিক উপায় রয়েছে। নিচে তিনটি জনপ্রিয় পদ্ধতির কোড এবং তাদের সুবিধা আলোচনা করা হলো।</p>
+                
+                <div class="card mx-auto shadow-sm" style="max-width: 700px;">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="tab-for-btn" data-bs-toggle="tab" data-bs-target="#tab-for" type="button" role="tab" aria-controls="tab-for" aria-selected="true">For Loop</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-forEach-btn" data-bs-toggle="tab" data-bs-target="#tab-forEach" type="button" role="tab" aria-controls="tab-forEach" aria-selected="false">forEach()</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-map-btn" data-bs-toggle="tab" data-bs-target="#tab-map" type="button" role="tab" aria-controls="tab-map" aria-selected="false">map()</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="code-content">
+                            <div class="tab-pane fade show active" id="tab-for" role="tabpanel" aria-labelledby="tab-for-btn">
+                                <p class="text-muted mb-3">এটি জাভাস্ক্রিপ্টের সবচেয়ে মৌলিক এবং পুরনো লুপ। এটি অ্যারের প্রতিটি উপাদানের উপর দিয়ে ক্রমানুসারে কাজ করে। নতুন ডেভেলপারদের জন্য এটি বোঝা সহজ।</p>
+                                <pre class="bg-light p-3 rounded"><code class="language-js">for (let i = 0; i < students.length; i++) {
+  let student = students[i];
+  let grade;
+
+  if (student.marks >= 80) {
+    grade = 'A+';
+  } else if (student.marks >= 70) {
+    grade = 'A';
+  } else if (student.marks >= 60) {
+    grade = 'A-';
+  } else if (student.marks >= 50) {
+    grade = 'B';
+  } else if (student.marks >= 40) {
+    grade = 'C';
+  } else {
+    grade = 'Fail';
+  }
+
+  student.grade = grade;
+}</code></pre>
+                            </div>
+                            <div class="tab-pane fade" id="tab-forEach" role="tabpanel" aria-labelledby="tab-forEach-btn">
+                                <p class="text-muted mb-3">`forEach()` একটি আধুনিক এবং সংক্ষিপ্ত পদ্ধতি। এটি কোডকে আরও পাঠযোগ্য করে তোলে। এটি মূল অ্যারের প্রতিটি উপাদানের উপর একটি ফাংশন চালায় কিন্তু কোনো নতুন অ্যারে তৈরি করে না।</p>
+                                <pre class="bg-light p-3 rounded"><code class="language-js">students.forEach(student => {
+    let grade;
+    if (student.marks >= 80) {
+        grade = 'A+';
+    } else if (student.marks >= 70) {
+        grade = 'A';
+    } else if (student.marks >= 60) {
+        grade = 'A-';
+    } else if (student.marks >= 50) {
+        grade = 'B';
+    } else if (student.marks >= 40) {
+        grade = 'C';
+    } else {
+        grade = 'Fail';
+    }
+    student.grade = grade;
+});</code></pre>
+                            </div>
+                            <div class="tab-pane fade" id="tab-map" role="tabpanel" aria-labelledby="tab-map-btn">
+                                <p class="text-muted mb-3">`map()` পদ্ধতিটি সবচেয়ে কার্যকর বলে মনে করা হয় কারণ এটি মূল অ্যারে পরিবর্তন না করে একটি নতুন অ্যারে তৈরি করে। এটি ডেটার অপরিবর্তনীয়তা (immutability) বজায় রাখে, যা একটি ভালো প্রোগ্রামিং অভ্যাস।</p>
+                                <pre class="bg-light p-3 rounded"><code class="language-js">const newStudents = students.map(student => {
+    let grade;
+    if (student.marks >= 80) {
+        grade = 'A+';
+    } else if (student.marks >= 70) {
+        grade = 'A';
+    } else if (student.marks >= 60) {
+        grade = 'A-';
+    } else if (student.marks >= 50) {
+        grade = 'B';
+    } else if (student.marks >= 40) {
+        grade = 'C';
+    } else {
+        grade = 'Fail';
+    }
+    return { ...student, grade };
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialStudents = [
+                { name: 'A', roll: 101, marks: 85 },
+                { name: 'B', roll: 102, marks: 72 },
+                { name: 'C', roll: 103, marks: 59 },
+                { name: 'D', roll: 104, marks: 45 },
+                { name: 'E', roll: 105, marks: 30 }
+            ];
+
+            const initialDataContainer = document.getElementById('initial-data-container');
+            const resultDataContainer = document.getElementById('result-data-container');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const chartSection = document.getElementById('chart-section');
+            let gradeChart = null;
+
+            const renderStudentCard = (student, isResult = false) => {
+                const gradeColor = {
+                    'A+': 'bg-success text-white',
+                    'A': 'bg-primary text-white',
+                    'A-': 'bg-info text-white',
+                    'B': 'bg-secondary text-white',
+                    'C': 'bg-warning text-white',
+                    'Fail': 'bg-danger text-white'
+                };
+
+                return `
+                    <div class="card shadow-sm">
+                        <div class="card-body d-flex justify-content-between align-items-center p-3">
+                            <div>
+                                <p class="card-text fw-bold mb-0">${student.name}</p>
+                                <p class="card-text text-muted mb-0">রোল: ${student.roll} | নম্বর: ${student.marks}</p>
+                            </div>
+                            ${isResult ? `<span class="badge rounded-pill ${gradeColor[student.grade] || 'bg-light text-dark'}">${student.grade}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            };
+
+            const renderInitialData = () => {
+                initialDataContainer.innerHTML = initialStudents.map(s => renderStudentCard(s)).join('');
+            };
+            
+            const getGrade = (marks) => {
+                if (marks >= 80) return 'A+';
+                if (marks >= 70) return 'A';
+                if (marks >= 60) return 'A-';
+                if (marks >= 50) return 'B';
+                if (marks >= 40) return 'C';
+                return 'Fail';
+            };
+
+            calculateBtn.addEventListener('click', () => {
+                const studentsWithGrades = initialStudents.map(student => {
+                    return { ...student, grade: getGrade(student.marks) };
+                });
+
+                resultDataContainer.innerHTML = studentsWithGrades.map(s => renderStudentCard(s, true)).join('');
+                
+                chartSection.classList.remove('d-none');
+                renderChart(studentsWithGrades);
+                calculateBtn.textContent = 'পুনরায় গণনা করুন';
+            });
+
+            const renderChart = (data) => {
+                const gradeCounts = data.reduce((acc, student) => {
+                    acc[student.grade] = (acc[student.grade] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const sortedGrades = ['A+', 'A', 'A-', 'B', 'C', 'Fail'];
+                const chartLabels = sortedGrades.filter(grade => gradeCounts[grade]);
+                const chartData = chartLabels.map(grade => gradeCounts[grade]);
+
+                const ctx = document.getElementById('grade-chart').getContext('2d');
+                if (gradeChart) {
+                    gradeChart.destroy();
+                }
+                gradeChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'শিক্ষার্থীর সংখ্যা',
+                            data: chartData,
+                            backgroundColor: [
+                                'rgba(25, 135, 84, 0.6)',
+                                'rgba(13, 110, 253, 0.6)',
+                                'rgba(13, 202, 240, 0.6)',
+                                'rgba(108, 117, 125, 0.6)',
+                                'rgba(255, 193, 7, 0.6)',
+                                'rgba(220, 53, 69, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(25, 135, 84, 1)',
+                                'rgba(13, 110, 253, 1)',
+                                'rgba(13, 202, 240, 1)',
+                                'rgba(108, 117, 125, 1)',
+                                'rgba(255, 193, 7, 1)',
+                                'rgba(220, 53, 69, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `শিক্ষার্থী: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+            
+            renderInitialData();
+        });
+    </script>
+</body>
+</html>
